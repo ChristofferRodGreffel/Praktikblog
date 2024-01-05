@@ -125,7 +125,7 @@ const EditPost = () => {
             setState={setRefleksionsLog}
           />
           <div>
-            <CustomButton text="Opret indlæg" loading={loading} />
+            <CustomButton text="Gem ændringer" loading={loading} />
           </div>
         </form>
       </div>

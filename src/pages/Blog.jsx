@@ -1,15 +1,19 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import PageWrapper from "../components/PageWrapper";
 import BlogPost from "../components/BlogPost";
 import { onAuthStateChanged } from "firebase/auth";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../firebase-config";
 import { collection, getDocs, onSnapshot, query } from "firebase/firestore";
 import { timestampConvert } from "../helperfunctions/TimestampConvert";
+import TopInfoBar from "../components/TopInfoBar";
 
 const Blog = () => {
   const [userIsAdmin, setUserIsAdmin] = useState();
+  const [originalBlogPosts, setOriginalBlogPosts] = useState([]);
   const [blogPosts, setBlogPosts] = useState([]);
   const [postsLoaded, setPostsLoaded] = useState(false);
+  const [unread, setUnread] = useState(0);
+  const postsRef = useRef(null);
 
   useEffect(() => {
     onAuthStateChanged(FIREBASE_AUTH, (user) => {
@@ -45,38 +49,73 @@ const Blog = () => {
         posts.push(doc.data());
       });
       setBlogPosts(posts);
+      setOriginalBlogPosts(posts);
       setPostsLoaded(true);
     });
   };
 
   useEffect(() => {
     if (blogPosts.length > 0 && postsLoaded) {
-      sortPosts("newest");
+      if (localStorage.getItem("sortType") !== null) {
+        const chosenSortType = localStorage.getItem("sortType");
+        sortPosts(chosenSortType);
+      } else {
+        sortPosts("newest");
+      }
       setPostsLoaded(false);
+
+      let currentUnread = 0;
+      blogPosts.forEach((post) => {
+        if (!post.usersRead.includes(FIREBASE_AUTH.currentUser.uid)) {
+          currentUnread++;
+        }
+      });
+      setUnread(currentUnread);
     }
   }, [postsLoaded]);
 
   const sortPosts = async (sortType) => {
-    const arrayToSort = [...blogPosts];
+    const arrayToSort = [...originalBlogPosts];
+    const filterOptions = document.querySelector("#filterOptions");
 
-    const compareFunction = (a, b) => {
-      const dateComparison = new Date(b.date.seconds) - new Date(a.date.seconds);
+    if (sortType === "unread") {
+      filterOptions.value = "unread";
+      const sortedArray = [];
+      blogPosts.forEach((post) => {
+        if (!post.usersRead.includes(FIREBASE_AUTH.currentUser.uid)) {
+          sortedArray.push(post);
+        }
+      });
+      setBlogPosts(sortedArray);
+      localStorage.setItem("sortType", "unread");
+      postsRef.current.scrollIntoView({ behavior: "smooth" });
+    } else {
+      const compareFunction = (a, b) => {
+        const dateComparison = new Date(b.date.seconds) - new Date(a.date.seconds);
 
-      if (sortType === "newest") {
-        return dateComparison;
-      } else if (sortType === "oldest") {
-        return -dateComparison;
-      }
+        if (sortType === "newest") {
+          localStorage.setItem("sortType", "newest");
+          filterOptions.value = "newest";
+          return dateComparison;
+        } else if (sortType === "oldest") {
+          localStorage.setItem("sortType", "oldest");
+          filterOptions.value = "oldest";
+          return -dateComparison;
+        }
 
-      return 0; // Default case
-    };
+        return 0; // Default case
+      };
 
-    const sortedPosts = arrayToSort.sort(compareFunction);
-    setBlogPosts(sortedPosts);
+      const sortedPosts = arrayToSort.sort(compareFunction);
+      setBlogPosts(sortedPosts);
+    }
   };
 
   return (
     <>
+      {unread > 0 && (
+        <TopInfoBar text={`Du har ${unread} ulæste indlæg - klik for at læse`} function={() => sortPosts("unread")} />
+      )}
       <PageWrapper>
         <div className="lg:w-[70%] m-auto">
           <div>
@@ -93,11 +132,11 @@ const Blog = () => {
               <p>Frontendudvikling</p>
             </div>
           </div>
-          <div className="mt-10 m-auto">
+          <div ref={postsRef} className="mt-10 m-auto">
             <div>
               <div className="flex justify-between items-end mb-2">
                 <h2 className="text-[2rem] leading-8 font-bebasNeue justify-self-end">
-                  Alle indlæg {`(${blogPosts.length})`}
+                  Alle indlæg {`(${originalBlogPosts.length})`}
                 </h2>
                 <select
                   onChange={(e) => sortPosts(e.target.value)}
@@ -108,6 +147,7 @@ const Blog = () => {
                 >
                   <option value="newest">Nyeste først</option>
                   <option value="oldest">Ældste først</option>
+                  <option value="unread">Ulæste indlæg</option>
                 </select>
               </div>
               <hr className="border-t-2 border-primaryGrey rounded-full" />
@@ -120,6 +160,7 @@ const Blog = () => {
                       <div key={key}>
                         <BlogPost
                           id={post.id}
+                          usersRead={post.usersRead}
                           title={post.postTitle}
                           date={timestampConvert(post.date.seconds, "stampToDate")}
                           time={timestampConvert(post.date.seconds, "stampToHourMinute")}
@@ -132,7 +173,13 @@ const Blog = () => {
                   })}
                 </>
               ) : (
-                <p className="text-lg font-light">Der er endnu ingen indlæg...</p>
+                <>
+                  {unread == 0 ? (
+                    <p>Du har ingen ulæste indæg...</p>
+                  ) : (
+                    <p className="text-lg font-light">Der er endnu ingen indlæg...</p>
+                  )}
+                </>
               )}
             </div>
           </div>

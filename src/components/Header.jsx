@@ -24,7 +24,7 @@ const Header = (props) => {
     <>
       {props?.userIsAdmin ? (
         <header className="flex justify-between w-[90%] m-auto mt-7 cursor-pointer">
-          <div className="flex flex-col items-center relative group">
+          <div onClick={() => navigate("/profile")} className="flex flex-col items-center relative group">
             <div className="flex justify-center items-center bg-primaryGrey rounded-full h-11 w-11 transition-all ease-in-out duration-100 md:hover:bg-primaryBlack">
               <i className="fa-solid fa-user-lock text-primaryWhite text-lg"></i>
             </div>

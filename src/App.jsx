@@ -11,6 +11,8 @@ import EditPost from "./pages/EditPost";
 import Header from "./components/Header";
 import ScrollToTop from "./helperfunctions/ScrollToTop";
 import { collection, getDocs } from "firebase/firestore";
+import Profile from "./pages/Profile";
+import TopInfoBar from "./components/TopInfoBar";
 
 function App() {
   const [userIsAdmin, setUserIsAdmin] = useState(false);
@@ -61,6 +63,7 @@ function App() {
         <Route path="/" element={<Blog />} />
         <Route path="/signin" element={<SignIn />} />
         <Route path="*" element={<Blog />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
     </>
   );

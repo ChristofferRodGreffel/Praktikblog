@@ -25,6 +25,7 @@ const CreatePost = () => {
       postTitle: postTitle,
       spontanLog: spontanLog,
       refleksionsLog: refleksionsLog,
+      usersRead: [],
       date: new Date(),
     });
 
