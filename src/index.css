@@ -1,0 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=Barlow:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&family=Bebas+Neue&display=swap");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --primary-grey: #404040;
+  --primary-blue: #05546c;
+  --primary-black: #000000;
+  --primary-white: #ffffff;
+}
+
+body {
+  font-family: "Barlow", sans-serif;
+  color: var(--primary-black);
+}
+
+.blueGradient {
+  background: linear-gradient(117deg, #00303f 0%, #006e90 100%);
+}
+
+.select {
+  outline: none;
+  border: 2px solid var(--primary-black);
+  cursor: pointer;
+  background-color: #fff;
+}
