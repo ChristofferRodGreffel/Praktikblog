@@ -22,13 +22,19 @@ const Blog = () => {
 
   const checkAdminStatus = async (user) => {
     const querySnapshot = await getDocs(collection(FIREBASE_DB, "admin"));
+
+    let isAdmin = false;
+
     querySnapshot.forEach((doc) => {
       if (doc.id === user) {
+        isAdmin = true;
         setUserIsAdmin(true);
-      } else {
-        setUserIsAdmin(false);
       }
     });
+
+    if (!isAdmin) {
+      setUserIsAdmin(false);
+    }
   };
 
   const getPostsFromFirestore = async () => {
