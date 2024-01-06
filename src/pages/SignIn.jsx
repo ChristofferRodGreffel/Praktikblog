@@ -1,8 +1,8 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PageWrapper from "../components/PageWrapper";
 import InputField from "../components/InputField";
 import CustomButton from "../components/CustomButton";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { onAuthStateChanged, signInWithEmailAndPassword } from "firebase/auth";
 import { FIREBASE_AUTH } from "../../firebase-config";
 import { toast } from "react-toastify";
 import { firebaseErrorsCodes } from "../../firebaseErrorCodes";
@@ -15,6 +15,14 @@ const SignIn = () => {
   const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
+
+  useEffect(() => {
+    onAuthStateChanged(FIREBASE_AUTH, (user) => {
+      if (user) {
+        navigate("/");
+      }
+    });
+  }, []);
 
   const handleUserSignIn = async (e) => {
     setLoading(true);

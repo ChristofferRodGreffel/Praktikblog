@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { FIREBASE_AUTH, FIREBASE_DB } from "../../firebase-config";
 import { arrayRemove, arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { toast } from "react-toastify";
+import { DefaultToastifySettings } from "../helperfunctions/DefaultToastSettings";
 
 const BlogPost = (props) => {
   const navigate = useNavigate();
@@ -18,10 +20,14 @@ const BlogPost = (props) => {
     if (props.usersRead.includes(currentUser)) {
       await updateDoc(postRef, {
         usersRead: arrayRemove(currentUser),
+      }).then(() => {
+        toast.success(`Markeret som ulæst`, DefaultToastifySettings);
       });
     } else {
       await updateDoc(postRef, {
         usersRead: arrayUnion(currentUser),
+      }).then(() => {
+        toast.success(`Markeret som læst`, DefaultToastifySettings);
       });
     }
   };
@@ -30,13 +36,30 @@ const BlogPost = (props) => {
     <>
       <div className="flex flex-col gap-5 p-5 lg:p-8 text-white blueGradient rounded-lg">
         <div>
-          <div className="flex gap-3 items-center justify-between">
+          <div className="flex flex-col-reverse md:flex-row gap-3 items-start justify-between">
             <h1 className="font-medium text-2xl">{props.title}</h1>
             {props?.admin && (
               <i
                 onClick={() => navigate(`/editpost/${props.id}`)}
                 className="fa-regular fa-pen-to-square text-3xl cursor-pointer transition-all duration-100 ease-in-out hover:text-primaryBlack"
               ></i>
+            )}
+            {!props?.admin && (
+              <>
+                <div onClick={togglePostRead} className="cursor-pointer">
+                  {postRead ? (
+                    <div className="flex flex-row-reverse md:flex-row gap-2 items-center">
+                      <p className="font-light italic">Markér som læst</p>
+                      <i className="fa-regular fa-bookmark text-3xl"></i>
+                    </div>
+                  ) : (
+                    <div className="flex flex-row-reverse md:flex-row gap-2 items-center">
+                      <p className="font-light italic">Markér som ulæst</p>
+                      <i className="fa-solid fa-bookmark text-3xl"></i>
+                    </div>
+                  )}
+                </div>
+              </>
             )}
           </div>
           <div className="flex gap-5 font-light">
@@ -63,7 +86,7 @@ const BlogPost = (props) => {
           </div>
         </div>
       </div>
-      <div
+      {/* <div
         onClick={togglePostRead}
         className="flex justify-center items-center gap-2 relative bottom-2.5 bg-darkBlue text-white font-light text-center text-lg py-2 rounded-b-lg cursor-pointer transition-all duration-100 ease-in-out"
       >
@@ -78,7 +101,7 @@ const BlogPost = (props) => {
             <i className="fa-solid fa-flag text-lg"></i>
           </>
         )}
-      </div>
+      </div> */}
     </>
   );
 };

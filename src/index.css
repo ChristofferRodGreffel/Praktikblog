@@ -7,7 +7,7 @@
 :root {
   --primary-grey: #404040;
   --primary-blue: #05546c;
-  --primary-blue-shaded: #05546cef;
+  --primary-blue-shaded: #05546ce1;
   --dark-blue: #00303f;
   --primary-black: #000000;
   --primary-white: #ffffff;
@@ -27,4 +27,57 @@ body {
   border: 2px solid var(--primary-black);
   cursor: pointer;
   background-color: #fff;
+}
+
+/* Scrollbar css */
+
+/* Firefox */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #05546c #ffffff;
+}
+
+/* Chrome, Edge and Safari */
+*::-webkit-scrollbar {
+  height: 10px;
+  width: 10px;
+}
+*::-webkit-scrollbar-track {
+  border-radius: 5px;
+  background-color: #ffffff;
+}
+
+*::-webkit-scrollbar-track:hover {
+  background-color: #ffffff;
+}
+
+*::-webkit-scrollbar-track:active {
+  background-color: #ffffff;
+}
+
+*::-webkit-scrollbar-thumb {
+  border-radius: 6px;
+  background-color: #05546c;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: #05546c;
+}
+
+*::-webkit-scrollbar-thumb:active {
+  background-color: #05546c;
+}
+
+/* Animations */
+
+@keyframes pop {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.15);
+  }
+  100% {
+    transform: scale(1);
+  }
 }

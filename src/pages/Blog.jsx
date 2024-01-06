@@ -6,6 +6,7 @@ import { FIREBASE_AUTH, FIREBASE_DB } from "../../firebase-config";
 import { collection, getDocs, onSnapshot, query } from "firebase/firestore";
 import { timestampConvert } from "../helperfunctions/TimestampConvert";
 import TopInfoBar from "../components/TopInfoBar";
+import CustomButton from "../components/CustomButton";
 
 const Blog = () => {
   const [userIsAdmin, setUserIsAdmin] = useState();
@@ -74,7 +75,7 @@ const Blog = () => {
     }
   }, [postsLoaded]);
 
-  const sortPosts = async (sortType) => {
+  const sortPosts = async (sortType, isTopBarClicked) => {
     const arrayToSort = [...originalBlogPosts];
     const filterOptions = document.querySelector("#filterOptions");
 
@@ -88,7 +89,10 @@ const Blog = () => {
       });
       setBlogPosts(sortedArray);
       localStorage.setItem("sortType", "unread");
-      postsRef.current.scrollIntoView({ behavior: "smooth" });
+
+      if (isTopBarClicked) {
+        postsRef.current.scrollIntoView({ behavior: "smooth" });
+      }
     } else {
       const compareFunction = (a, b) => {
         const dateComparison = new Date(b.date.seconds) - new Date(a.date.seconds);
@@ -113,8 +117,11 @@ const Blog = () => {
 
   return (
     <>
-      {unread > 0 && (
-        <TopInfoBar text={`Du har ${unread} ulæste indlæg - klik for at læse`} function={() => sortPosts("unread")} />
+      {!userIsAdmin && unread > 0 && (
+        <TopInfoBar
+          text={`Du har ${unread} ulæst(e) indlæg - tryk for at læse`}
+          function={() => sortPosts("unread", true)}
+        />
       )}
       <PageWrapper>
         <div className="lg:w-[70%] m-auto">
@@ -174,10 +181,13 @@ const Blog = () => {
                 </>
               ) : (
                 <>
-                  {unread == 0 ? (
-                    <p>Du har ingen ulæste indæg...</p>
+                  {unread == 0 && originalBlogPosts.length > 0 ? (
+                    <>
+                      <p className="text-lg italic">Du har ingen ulæste indlæg...</p>
+                      <CustomButton text="Se nyeste indlæg" function={() => sortPosts("newest")} />
+                    </>
                   ) : (
-                    <p className="text-lg font-light">Der er endnu ingen indlæg...</p>
+                    <p className="text-lg italic">Der er endnu ingen indlæg...</p>
                   )}
                 </>
               )}
